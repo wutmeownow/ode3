@@ -25,8 +25,8 @@
 
 using namespace std;
 const double g=9.81;    ///< acceleration [m/s^2]
-const double m=1.0;     ///< mass of object [kg], nb simple projectile motion does not depend on the mass
-const double air_k=0.1; ///< constant for air resistance, mass DOES matter
+const double m=1.0;     ///< mass of object [kg], nb for simple projectile motion does not depend on the mass
+const double air_k=0.1; ///< constant for air resistance. mass DOES matter with air resistance
 
 // functions to describe simple projectile motion
 // here use use ri,rj,rk to define directions to prevent confusion with
@@ -61,6 +61,9 @@ double f_rj(double x, const vector<double> &y){
 /// Change in velocity along  \f$\hat j\f$ axis
 /// \param[in] x independent variable
 /// \param[in] y dependent variables
+///
+/// Air resistance model: F= \f$k v^2\f$
+///
 double f_vj(double x, const vector<double> &y){  
   (void) x;
   return -air_k * sqrt(y[1]*y[1] + y[3]*y[3]) * y[3] / m - g;
