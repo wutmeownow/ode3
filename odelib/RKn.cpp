@@ -62,20 +62,18 @@ TGraph RK4Solve(double(*f)(double x, double y), double &y,
 /// for full control over the data in your intermediate steps.
 /// @param[in] fnlist vector of function pointers to the ODEs describing the system
 /// @param[in] y vector of initial conditions (this is updated by the step taken)
-/// @param[in] x value of dependent vaaiable
+/// @param[in] x value of dependent variable
 /// @param[in] h step size to use
 /// @param[in] params pointer to function parameters
 ///
 /// Returns the new vector of y values
-/// Unlike the other functions here this DOES NOT update the x,y inputs
-/// To do: code will be a little cleaner if this is not the case
+/// input values of x,y are not modified
 ///
 vector<double> RK4StepN(vector<pfunc_t> &fnlist, vector<double> y,
-			double x0, double h, void* params){
+			double x, double h, void* params){
   int nFcn=fnlist.size();
   vector<double> k1(nFcn), k2(nFcn), k3(nFcn), k4(nFcn);
   vector<double> ytmp(nFcn);
-  double x=x0;
   
   for (int i=0; i<nFcn; i++){
     k1[i] = h * fnlist[i](x, y, params);
@@ -94,7 +92,7 @@ vector<double> RK4StepN(vector<pfunc_t> &fnlist, vector<double> y,
   }
   // calculate next step
   for (int i=0; i<nFcn; i++) {
-    y[i] = y[i] + k1[i]/6 + k2[i]/3 + k3[i]/3 + k4[i]/6;
+    y[i] = y[i] + k1[i]/6. + k2[i]/3. + k3[i]/3. + k4[i]/6.;
   }
   return y;
 }
@@ -243,8 +241,8 @@ vector<TGraph> RK4SolveNA(vector<pfunc_t> &fnlist, vector<double> &y,
 
   assert(fnlist.size() == y.size());   // need one initial condition per function
   int nFcn=fnlist.size();
-  double h=(xmax-x)/nsteps;     // step size
-  double h_last=0, h_new=0;      // for tracking adapted step size
+  double h=(xmax-x)/nsteps;    // initial step size
+  double h_last=0, h_new=0;    // for tracking adapted step size
   vector<double> y1,y2;          // temporary storage for adapting steps
   
   vector<TGraph> tg = SetupGraphs(nFcn);

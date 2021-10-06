@@ -68,5 +68,5 @@ vector<TGraph> RK4SolveNA(vector<pfunc_t> &fnlist, vector<double> &y,
 
 vector<TGraph> RK4SolveNA(vector<pfunc_t> &fnlist, vector<double> &y,
 			  double h,  double &x, void *params=0, pfunc_t fstop=0, 
-			  double errdef=1e-9, int maxrep=5, int maxsteps=1000);
+			  double errdef=1e-9, int maxrep=5, int maxsteps=10000);
 

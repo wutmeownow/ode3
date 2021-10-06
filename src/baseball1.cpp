@@ -1,5 +1,5 @@
 ///
-/// Starter templated for first baseball problem
+/// Starter template for first baseball problem
 /// Solve for the initial speed of the pitch given the initial parameters
 /// xend : distance to home plate [18.5] m
 /// z0 : height of release of ball [1.4] m
@@ -64,13 +64,14 @@ int main(int argc, char **argv){
       theta0 = atof(optarg);
       break;
     case 'p':
-      showPlot=true;   
+      showPlot=true;
+      break;
     case '?':
       fprintf (stderr, "Unknown option `%c'.\n", optopt);
     }
   TApplication theApp("App", &argc, argv); // init ROOT App for displays
 
-  
+
   double vPitch = 0;   // m/s of pitch needed to land in strike zone at 0.9 meters
   // write code to solve for vPitch here
 

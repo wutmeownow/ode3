@@ -6,19 +6,31 @@ CXXFLAGS  += $(ROOTCFLAGS) -I$(ODELIB) -Wall -O3
 LDFLAGS    = $(ROOTLIBS) $(ROOTGLIBS) -Wl,-rpath,$(ODELIB) -L$(ODELIB) -lode
 GXX	   = g++ $(CXXFLAGS)
 
-SRCS = $(wildcard *.cpp)
-OBJ = $(SRC:.cpp=.o)
-EXES = $(SRCS:%.cpp=%)
-dep = $(OBJ:.o=.d)  # one dependency file for each source
+
+EXES=baseball1 baseball2 RKnDemo RKnStep RKnTest
 
 
 all: $(EXES)
 
-$(EXES):  $(SRCS)
-	$(GXX) $(CXXFLAGS) -MMD -c $@.cpp
-	$(GXX) $@.cpp -o$@ $(LDFLAGS)
+RKnDemo: RKnDemo.cpp $(ODELIB)/RKn.hpp 
+	$(GXX) $(CXXFLAGS) -o$@ $@.cpp $(LDFLAGS)
+
+RKnStep: RKnStep.cpp $(ODELIB)/RKn.hpp 
+	$(GXX) $(CXXFLAGS) -o$@ $@.cpp $(LDFLAGS)
+
+RKnTest: RKnTest.cpp $(ODELIB)/RKn.hpp 
+	$(GXX) $(CXXFLAGS) -o$@ $@.cpp $(LDFLAGS)
+
+baseball1: baseball1.cpp $(ODELIB)/RKn.hpp 
+	$(GXX) $(CXXFLAGS) -o$@ $@.cpp $(LDFLAGS) 
+
+baseball2: baseball2.cpp $(ODELIB)/RKn.hpp 
+	$(GXX) $(CXXFLAGS) -o$@ $@.cpp $(LDFLAGS)
+
+
+
 
 clean:
-	rm -f *.o *.so *.d *~ $(EXES) $(dep)
+	rm -f *.o *.so *.d *~ $(EXES)
 
 
