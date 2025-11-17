@@ -10,7 +10,7 @@ Description of example programs:<br>
 **RKnTest**: Solves a single 1st order ODE using the single equation RK4 solver and the ODE array solver
 
 **RKnStep**: Solves a single 1st order ODE using the single equation RK4 solver and the ODE array solver<br>
-Basic version or ODE array solver applied to projectile motion with a simple model of air resistance, force of air resistance = -kv^2<br>
+A basic example of the ODE array solver is applied to projectile motion with a simple model of air resistance, force of air resistance = -kv^2<br>
 At each step in the calculation time and x,t positions are printed.<br>
 Optional parameters [default values]<br>
 * -v initial_velocity [100] m/s
