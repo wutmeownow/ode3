@@ -97,7 +97,7 @@ int main(int argc, char **argv){
   // setup default parameters
   Params pars;
   pars.g=9.81;
-  pars.m=10.0;
+  pars.m=2.;
   pars.air_k=0.1;
   void *p_par = (void*) &pars;
 
