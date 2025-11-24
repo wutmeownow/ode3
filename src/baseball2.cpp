@@ -11,6 +11,7 @@
 #include "TApplication.h"
 #include "TLegend.h"
 #include "TFile.h"
+#include "TAxis.h"
 #include "TStyle.h"
 #include "TGClient.h"
 #include <gsl/gsl_errno.h>
@@ -63,7 +64,7 @@ int func (double t, const double y[], double f[], void *params) {
   f[0] = y[1];                         // f_ri
   f[1] = -F * v * y[1] + p->B * p->omega * (y[3]*p->sinPhi - y[5]*p->cosPhi);        // f_vi
   f[2] = y[3];                         // f_rj
-  f[3] = -F * v * y[3] + p->B * p->omega * y[1] * p->sinPhi - p->g;    // f_vj
+  f[3] = -F * v * y[3] - p->B * p->omega * y[1] * p->sinPhi - p->g;    // f_vj
   f[4] = y[5];
   f[5] = -F * v * y[5] + p->B * p->omega * y[1] * p->cosPhi; // f_vk
   return GSL_SUCCESS;
@@ -78,7 +79,6 @@ int main(int argc, char **argv){
   // y[3] = 0;                // vy  "y" is measured as left/right divergence from line to plate
   // y[5] = v0*sin(theta0);   // vz  "z" is vertival measure
   // vector<double> y0(6);
-  double y[6];
 
   bool showPlot=false;
   // pitches
@@ -95,9 +95,9 @@ int main(int argc, char **argv){
   pars.a=0.0039;
   pars.b=0.0058;
   pars.vd=35; // m/s
-  pars.delta=5 // m/s
+  pars.delta=5; // m/s
   pars.B=4.1e-4;
-  pars.omega=1800/60.; // rps
+  pars.omega=2*M_PI*1800/60.; // rps
 
 
   while ((c = getopt (argc, argv, "p:n")) != -1) {
@@ -116,25 +116,25 @@ int main(int argc, char **argv){
   TString title;
   if (ip==0){
     cout << "Setting up initial conditions for slider" << endl;
-    title="Slider";
+    title="slider";
     phi=0.;
     v0=85.;
   }
   else if (ip==1){
     cout << "Setting up initial conditions for curveball" << endl;
-    title="Curveball";
+    title="curveball";
     phi=45.;
     v0=85.;
   }
   else if (ip==2){
     cout << "Setting up initial conditions for screwball" << endl;
-    title="Screwball";
+    title="screwball";
     phi=135.;
     v0=85.;
   }
   else {
     cout << "Setting up initial conditions for fastball" << endl;
-    title="Fastball";
+    title="fastball";
     phi=225.;
     v0=95.;
   }
@@ -142,6 +142,7 @@ int main(int argc, char **argv){
   // finish setting params
   pars.cosPhi = cos(phi*M_PI/180);
   pars.sinPhi = sin(phi*M_PI/180);
+  void *p_par = (void*) &pars;
 
   TApplication theApp("App", &argc, argv); // init ROOT App for displays
 
@@ -149,9 +150,9 @@ int main(int argc, char **argv){
   double z0=0;  // height of release [m]
   double y0=0.; // depth of release
   double theta0=1; // angle of velocity at release (degrees)
-  double vx0=v0* cos(theta0*M_PI/180) * MPH_TO_MPS; // initial x vel
-  double vz0=v0* sin(theta0*M_PI/180) * MPH_TO_MPS; // initial z vel
-  double vy0=0.;  // initial y vel
+  double vx0=v0* cos(theta0*M_PI/180) * MPH_TO_MPS; // initial x vel m/s
+  double vz0=v0* sin(theta0*M_PI/180) * MPH_TO_MPS; // initial z vel m/s
+  double vy0=0.;  // initial y vel m/s
   double xend=18.44;   // meters to plate
   double yend=0;    // tbd
   double zend=0;    // tbd
@@ -160,14 +161,72 @@ int main(int argc, char **argv){
   double vzend=0;
 
   // write code here
+  // set initial conditions
+  double y[6]={x0, vx0, z0, vz0, y0, vy0};
+  double t = 0.0;
+  double dt = 0.0001; // ms time step
+
+  // canvas for graph
+  TCanvas *c2 = new TCanvas("c2","baseball2 gsl",600,600);
+  TGraph *tzvsx = new TGraph();
+  tzvsx->SetTitle(title + ";x (ft);z (ft)");
+  TGraph *tyvsx = new TGraph();
+  tyvsx->SetTitle(title + ";x (ft);y (ft)");
+
+  
+
+  // Init the ODE solver, by defining the system of equations.
+  // The second parameter below is the Jacobian (a function if provided to calcualte
+  // partial derivatives of the functions).  This is not used for RK algorithms,
+  // so we set the function pointer to 0.
+  // The params array allows us to set parameters in the functions.
+  // {func, jacoboan fcn, dimension, params (can be 0 if not used)}
+  gsl_odeiv2_system sys = {func, 0, 6, p_par};
+
+  // set gsl driver
+  gsl_odeiv2_driver *drv =
+        gsl_odeiv2_driver_alloc_y_new(&sys, gsl_odeiv2_step_rk8pd,1e-9, 1e-9, 0.0);
+
+
+  // set initial points
+  tzvsx->SetPoint(tzvsx->GetN(),y[0]* M_TO_FT,y[2]* M_TO_FT);
+  tyvsx->SetPoint(tyvsx->GetN(),y[0]* M_TO_FT,y[4]* M_TO_FT);
+  // integrate until x reaches xend
+  while (y[0] < xend) {
+    int status = gsl_odeiv2_driver_apply(drv, &t, t + dt, y);
+    if (status != GSL_SUCCESS) { break; }
+    tzvsx->SetPoint(tzvsx->GetN(),y[0]* M_TO_FT,y[2]* M_TO_FT);
+    tyvsx->SetPoint(tyvsx->GetN(),y[0]* M_TO_FT,y[4]* M_TO_FT);
+  }
+
+  // graph
+  // graph
+  tzvsx->Draw("AC");
+  tzvsx->GetXaxis()->SetLimits(0,xend*M_TO_FT);
+  tzvsx->GetYaxis()->SetRangeUser(-4,2);
+  tzvsx->Draw("AC");
+  tyvsx->SetLineStyle(2);
+  tyvsx->Draw("L SAME");
+  c2->Print(title + "GSL.pdf");
+
+  // set final parameters for comparison
+  xend = y[0] * M_TO_FT;
+  zend = y[2] * M_TO_FT;
+  yend = y[4] * M_TO_FT;
+  vxend = y[1] / MPH_TO_MPS;
+  vzend = y[3] / MPH_TO_MPS;
+  vyend = y[5] / MPH_TO_MPS;
+  double v = sqrt(y[1]*y[1] + y[3]*y[3] + y[5]*y[5]) / MPH_TO_MPS;
 
 
   // to compare to the plots in Fitzpatrick, output your results in **feet**
   // do not change these lines
   printf("********************************\n");
   printf("Coordinates when x=60 feet\n");
-  printf("(x,y,x) = (%lf,%lf,%lf)\n",xend,yend,zend);
+  printf("(x,y,z) = (%lf,%lf,%lf)\n",xend,yend,zend);
   printf("(vx,vy,vz) = (%lf,%lf,%lf)\n",vxend,vyend,vzend);
+  printf("(v) = (%lf)\n",v);
+  printf("(t) = (%lf)\n",t);
   printf("********************************\n");
 
   // plot the trajectory.  See Fitzpatrick for plot details

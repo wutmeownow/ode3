@@ -31,7 +31,7 @@ baseball1: baseball1.cpp $(ODELIB)/RKn.hpp
 	$(GXX) $(CXXFLAGS) -o$@ $@.cpp $(LDFLAGS) $(GSLFLAGS)
 
 baseball2: baseball2.cpp $(ODELIB)/RKn.hpp 
-	$(GXX) $(CXXFLAGS) -o$@ $@.cpp $(LDFLAGS)
+	$(GXX) $(CXXFLAGS) -o$@ $@.cpp $(LDFLAGS) $(GSLFLAGS)
 
 projGSL: projGSL.cpp
 	$(GXX) $(CXXFLAGS) -o$@ $@.cpp $(LDFLAGS) $(GSLFLAGS)
