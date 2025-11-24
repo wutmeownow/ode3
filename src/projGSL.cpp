@@ -53,14 +53,14 @@ int main(int argc, char **argv){
 
   // ******************************************************************************
   // ** this block is useful for supporting both high and std resolution screens **
-  UInt_t dh = gClient->GetDisplayHeight()/2;   // fix plot to 1/2 screen height  
+  // UInt_t dh = gClient->GetDisplayHeight()/2;   // fix plot to 1/2 screen height  
   //UInt_t dw = gClient->GetDisplayWidth();
-  UInt_t dw = 2.2*dh;
+  // UInt_t dw = 2.2*dh;
   // ******************************************************************************
 
   
   // m, air_k specified as parameters
-  double params[]={1.0, 0.12};
+  double params[]={0.001, 0.12};
 
   // Init the ODE solver, by defining the system of equations.
   // The second parameter below is the Jacobian (a function if provided to calcualte
@@ -82,12 +82,13 @@ int main(int argc, char **argv){
   double y[4]={0,10,0,10};   // x=0, vx=10 m/s, y=0, vy=10 m/s
 
   // make two graphs from the trajectory, using small time steps
-  TCanvas *c2 = new TCanvas("c2","Projectile GSL",dw,dh);
+  TCanvas *c2 = new TCanvas("c2","Projectile GSL",1200,600);
   c2->Divide(2,1);
   TGraph *tgYvX = new TGraph();
   tgYvX->SetTitle("Height vs distance;Horizontal distance [m];Vertical distance [m]");
   TGraph *tgKEvt = new TGraph();
   tgKEvt->SetTitle("Kinetic E vs time;time [s];KE [J]");
+  
 
   // calculate a trajectory
   double t=0;
@@ -113,6 +114,7 @@ int main(int argc, char **argv){
   tgYvX->Draw("AC");
   c2->cd(2);
   tgKEvt->Draw("AC");
+  c2->Print("projGSL.pdf");
   
   
   // save our graphs

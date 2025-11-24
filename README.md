@@ -26,6 +26,10 @@ Optional parameters [default values]<br>
 * -k coefficient_of_air_resistance [0.1] kg/m
 
 **baseball1**:  Starter template for first baseball problem
+********************************
+(xend,z0,theta0) = (18.500000,1.400000,1.000000)
+v_pitch = 48.255908 m/s
+********************************
 
 **baseball2**:  Starter template for second baseball problem
 
