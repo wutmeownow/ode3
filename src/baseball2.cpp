@@ -170,8 +170,10 @@ int main(int argc, char **argv){
   TCanvas *c2 = new TCanvas("c2","baseball2 gsl",600,600);
   TGraph *tzvsx = new TGraph();
   tzvsx->SetTitle(title + ";x (ft);z (ft)");
+  tzvsx->SetName("g1");
   TGraph *tyvsx = new TGraph();
   tyvsx->SetTitle(title + ";x (ft);y (ft)");
+  tyvsx->SetName("g2");
 
   
 
@@ -200,7 +202,6 @@ int main(int argc, char **argv){
   }
 
   // graph
-  // graph
   tzvsx->Draw("AC");
   tzvsx->GetXaxis()->SetLimits(0,xend*M_TO_FT);
   tzvsx->GetYaxis()->SetRangeUser(-4,2);
@@ -208,6 +209,12 @@ int main(int argc, char **argv){
   tyvsx->SetLineStyle(2);
   tyvsx->Draw("L SAME");
   c2->Print(title + "GSL.pdf");
+
+  // save our graphs
+  TFile *tf=new TFile(title + ".root","recreate");
+  tzvsx->Write();
+  tyvsx->Write();
+  tf->Close();
 
   // set final parameters for comparison
   xend = y[0] * M_TO_FT;
