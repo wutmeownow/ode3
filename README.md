@@ -25,13 +25,20 @@ Optional parameters [default values]<br>
 * -m mass_of_projectile [10] kg
 * -k coefficient_of_air_resistance [0.1] kg/m
 
+Energy seems to be well conserved after the first few steps, at least for small step sizes.
+
 **baseball1**:  Starter template for first baseball problem
 ********************************
 (xend,z0,theta0) = (18.500000,1.400000,1.000000)
 v_pitch = 48.255908 m/s
 ********************************
 
-**baseball2**:  Starter template for second baseball problem
+**baseball2**:
+- gsl integration of 4 baseball pitches like in Fitzpatrick
+- make and run for each pitch to create a single pdf and root file for each pitch
+- run baseball2Plot.py to save all plots to a single pdf
+
+**vterm**: cpp code to integrate and plot terminal velocity vs mass. This plot can be cross checked with the analytical solution of terminal velocity for quadratic air resistance given by vterm=sqrt(mg/k) where k is the coefficient of the air resistance. I drew the analytic solution on top of the numerical ode solution and they agree very well.
 
 **baseball_drag.ipynb**: this notebook describes the drag force equations used in the text.
 

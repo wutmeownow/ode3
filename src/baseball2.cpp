@@ -25,6 +25,10 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 
+// gsl integration of 4 baseball pitches like in Fitzpatrick
+// make and run for each pitch to create a single pdf and root file for each pitch
+// run baseball2Plot.py to save all plots to a single pdf
+
 double const M_TO_FT = 3.28084; // conversion for meters to feet
 double const MPH_TO_MPS = 0.44704; // conversion for mph to meters per second
 
